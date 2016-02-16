@@ -39,7 +39,7 @@ the app creator should have a separate collection of categories, which the entit
 ```javascript
 // The admins's collection
 {
-	"1": 'finance,
+	"1": "finance",
     "2": "chat",
     "3": "real estate"
 }
