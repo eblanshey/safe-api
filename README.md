@@ -322,6 +322,8 @@ The SAFE props added to your component will have the following format:
 
 Additionally, by default there will always be an `api` prop added to each injected component; it will contain all the methods found in the **Raw API Methods** section above.
 
+The entities and collections you request will automatically be retrieved from the SAFE network. If a cached copy already exists, it will be used. Use the `getEntity()` or `getCollection()` API methods to force an update.
+
 #### h(identification, propName, hierarchyCallback)
 
 When returning the array of object identifiers from `mapPropsToSafe`, each array element should return the result of this function, which we will call a SafeObject. This object will be used for instructions on how to fetch the objects from SAFE.
@@ -381,6 +383,7 @@ For a complete example of hierarchyCallback, please see the Like component -----
 ### To Do / Future Ideas
 
 * **Deletes** -- add a DELETE operation.
+* **Nested locations** -- objects are currently stored with their name serving as the location. Allow using nested locations. E.g. allow storing a collection of 'likes' for a particular post at `/users/userid/collections/postLikes/mypostid/likes/1234`.
 * **Models** -- allow passing in specialized Models to the "h" function. These models will have built-in functions that automatically validate the data retrieved from SAFE. It is possible for users to modify data on their own drives to have invalid, bogus, or even dangerous data. Validation will ensure that the application will retrieves data it knows how to use. See issue for discussion (coming soon)
 * **Versioning** -- also to be added to models. As apps evolve, their data naturally change. Since users own their own data, it is impossible for a site admin to update all data to use new rules. Adding versioning capability will allow the app to easily process outdated data by transforming it to a modern format. See issue for discussion (coming soon)
 * **Test coverage** -- add comprehensive unit tests
