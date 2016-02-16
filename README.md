@@ -13,6 +13,8 @@ The "network" currently uses Firebase to replicate SAFE functionality, as they o
 
 **This api is in a pre-alpha state, and is subject to breaking changes. Use at your own risk.**
 
+[Click here](https://github.com/eblanshey/safe-demo) for a demo app created using this API.
+
 ### Theory and Understanding App Architecture
 
 In order to use the API, a common convention for organizing data must be used. I will use the example of a simple app that functions as a directory of apps on the SAFE network. Users can post SAFE apps they are working on, as well as "like" other peoples' apps. The demo I made is exactly this directory. Having an app that contains other apps is confusing, so I will refer to the apps that users submit as "posts" from now on.
@@ -101,7 +103,7 @@ It is important to note that the implementation of collections in this api will 
 
 The above structure will allow the app developer to find each entity in the collection. *(Discussion point: should the app know that this collection contains entities, or should it be explicit with a `objectType` key? This might allow for automated nested object retrieval in the future)*
 
-All of the above concepts are used in the demo React app.
+All of the above concepts are used in the [demo React app](https://github.com/eblanshey/safe-demo).
 
 ### Installation and Setup
 
@@ -378,7 +380,7 @@ function mapPropsToSafe(props) {
 
 First, the `toDoList` collection owned by the `props.userid` user will be fetched. After it is fetched, the callback will be called for each collection item, with the to-do id as the second argument, and the object (containing the userid) as the first argument. The function will return a new array of SafeObjects that will also be added to the same component. The `{}` indicates not to make each to-do its own prop, but rather combine them all in a single prop called `toDos`. The keys of the objects will be the entity IDs.
 
-For a complete example of hierarchyCallback, please see the Like component ----- in the demo app.
+For a complete example of hierarchyCallback, please see the [Like component](https://github.com/eblanshey/safe-demo/blob/master/src/components/Like.js) in the demo app.
 
 ### To Do / Future Ideas
 
