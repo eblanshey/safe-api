@@ -9,7 +9,7 @@ As of this writing (2016-02-14) the SAFE api has not been released, but a genera
 * takes care of state and cache management
 * provides an additional wrapper that makes writing [React](https://facebook.github.io/react/) apps a breeze
 
-The "network" currently uses Firebase to replicate SAFE functionality, as they offer many similarities such as built-in authentication, URI based data, GET/PUT/DELETE functionality, etc. It will be replaced with Firebase as soon as possible.
+The "network" currently uses Firebase to replicate SAFE functionality, as they offer many similarities such as built-in authentication, URI based data, GET/PUT/DELETE functionality, etc. Firebase will be replaced with the test network as soon as possible.
 
 **This api is in a pre-alpha state, and is subject to breaking changes. Use at your own risk.**
 
