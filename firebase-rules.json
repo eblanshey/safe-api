@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "users": {
+      "$userid": {
+        "entities": {
+          ".write": "$userid === auth.uid",
+          ".read": true
+        },
+        "collections": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+}
