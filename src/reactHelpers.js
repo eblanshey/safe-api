@@ -54,8 +54,12 @@ export function connectToSafe(mapPropsToSafe) {
         }
       }
 
+      getRef() {
+        return this.refs.wrappedRef
+      }
+
       render() {
-        return <WrappedComponent {...this.props} {...this.state} api={api} />
+        return <WrappedComponent {...this.props} {...this.state} api={api} ref="wrappedRef" />
       }
     }
   }

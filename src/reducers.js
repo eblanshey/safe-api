@@ -27,6 +27,8 @@ function collections(collectionState, action) {
     [
       'GET_COLLECTION_REQUEST', 'GET_COLLECTION_SUCCESS', 'GET_COLLECTION_FAILURE',
       'PUT_COLLECTION_REQUEST', 'PUT_COLLECTION_SUCCESS', 'PUT_COLLECTION_FAILURE',
+      'DELETEITEM_COLLECTION_REQUEST', 'DELETEITEM_COLLECTION_SUCCESS', 'DELETEITEM_COLLECTION_FAILURE',
+      'DELETEWHOLE_COLLECTION_REQUEST', 'DELETEWHOLE_COLLECTION_SUCCESS', 'DELETEWHOLE_COLLECTION_FAILURE',
     ].indexOf(action.type) < 0
   ) {
     return collectionState
@@ -40,26 +42,33 @@ function collections(collectionState, action) {
     return collectionState.updateIn([name, userid], defaultCollection, collection => reducers.setCollectionRequest(collection))
   } else if (action.type.indexOf('SUCCESS') > -1) {
     let request = action.type.substr(0, action.type.indexOf('_')),
-      newData
+      newData = null,
+      oldData = collectionState.getIn([name, userid, 'data'], undefined)
+
+    // If a new item was PUT, it needs to be added to the existing collection of apps, if available.
+    // If no collection exists, then do NOT add the new data to an empty collection, as the collection
+    // has not yet been fetched by the user. We will return the collection state as is -- it will
+    // be loaded by the user when he wants it. Same goes for deletes:
+    // don't change anything if it hasn't been fetched yet.
+    if (['PUT', 'DELETEITEM', 'DELETEWHOLE'].indexOf(request) > -1 && oldData === undefined) {
+      return collectionState
+    }
 
     if (request === 'PUT') {
-      let oldData = collectionState.getIn([name, userid, 'data'], undefined)
+      if (oldData === null)
+        oldData = Map()
 
-      // If a new item was PUT, it needs to be added to the existing collection of apps, if available.
-      // If no collection exists, then do NOT add the new data to an empty collection, as the collection
-      // has not yet been fetched by the user. We will return the collection state as is -- it will
-      // be loaded by the user when he wants it.
-      if (oldData === undefined) {
-        return collectionState
-      } else {
-        if (oldData === null)
-          oldData = Map()
-
-        newData = oldData.set(id, fromJS(data))
-      }
+      newData = oldData.set(id, fromJS(data))
     } else if (request === 'GET') {
       // If we fetched a collection, then the data returned is the entire collection
       newData = action.data
+    } else if (request === 'DELETEITEM') {
+      if (oldData) {
+        newData = oldData.delete(action.id)
+      }
+      // otherwise keep newData as null
+    } else if (request === 'DELETEWHOLE') {
+      // keep newData as null
     }
 
     return collectionState.updateIn([name, userid], defaultCollection, collection => reducers.setCollectionSuccess(collection, newData))
@@ -75,6 +84,7 @@ function entities(entityState, action) {
     [
       'GET_ENTITY_REQUEST', 'GET_ENTITY_SUCCESS', 'GET_ENTITY_FAILURE',
       'PUT_ENTITY_REQUEST', 'PUT_ENTITY_SUCCESS', 'PUT_ENTITY_FAILURE',
+      'DELETE_ENTITY_REQUEST', 'DELETE_ENTITY_SUCCESS', 'DELETE_ENTITY_FAILURE',
     ].indexOf(action.type) < 0
   ) {
     return entityState

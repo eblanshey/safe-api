@@ -15,6 +15,10 @@ export function putEntity(...args) {
   return store.dispatch(actions.putEntity(...args))
 }
 
+export function deleteEntity(...args) {
+  return store.dispatch(actions.deleteEntity(...args))
+}
+
 export function loadCollection(...args) {
   return store.dispatch(actions.loadCollection(...args))
 }
@@ -25,6 +29,14 @@ export function getCollection(...args) {
 
 export function putCollectionItem(...args) {
   return store.dispatch(actions.putCollectionItem(...args))
+}
+
+export function deleteCollectionItem(...args) {
+  return store.dispatch(actions.deleteCollectionItem(...args))
+}
+
+export function deleteEntireCollection(...args) {
+  return store.dispatch(actions.deleteEntireCollection(...args))
 }
 
 export function login(...args) {

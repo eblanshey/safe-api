@@ -2,8 +2,6 @@ import * as Firebase from './firebaseRepository'
 import * as actionTypes from './actionTypes'
 import { toJSifNeeded } from './utils'
 
-// We are going to cheat by dispatching actions right away instead of making the user
-// dispatch them from their app.
 import store from './store'
 
 // THUNKS
@@ -20,17 +18,15 @@ export function loadEntity(name, userid, id) {
 export function getEntity(name, userid, id) {
   const params = {name, userid, id}
 
-  return (dispatch) => {
+  return (dispatch, getStore) => {
     dispatch(actionWithData(actionTypes.GET_ENTITY_REQUEST, params))
 
     return Firebase
       .get(generateApiEndpoint('entity', name, userid, id))
-      .then(
-        (data) => {
+      .then((data) => {
           dispatch(actionWithData(actionTypes.GET_ENTITY_SUCCESS, Object.assign({}, {data}, params)))
           return data
-        },
-        (error) => {
+        }, (error) => {
           dispatch(actionWithData(actionTypes.GET_ENTITY_FAILURE, Object.assign({}, {error: error.message}, params)))
           throw new Error(error.message)
         }
@@ -41,8 +37,8 @@ export function getEntity(name, userid, id) {
 export function putEntity(name, userid, id, data) {
   const params = {name, userid, id, data}
 
-  return (dispatch) => {
-    if (!isLoggedIn()) {
+  return (dispatch, getState) => {
+    if (!isLoggedIn(getState)) {
       // PUTTING data requires login to the network
       let error = 'You must be logged in before you can do that'
       dispatch(actionWithData(actionTypes.PUT_ENTITY_FAILURE, Object.assign({}, {error}, params)))
@@ -53,13 +49,38 @@ export function putEntity(name, userid, id, data) {
 
     return Firebase
       .set(generateApiEndpoint('entity', name, userid, id), data)
-      .then(
-      () => {
+      .then(() => {
         dispatch(actionWithData(actionTypes.PUT_ENTITY_SUCCESS, Object.assign({}, {data}, params)))
         return data
-      },
-      (error) => {
+      }, (error) => {
         dispatch(actionWithData(actionTypes.PUT_ENTITY_FAILURE, Object.assign({}, {error: error.message}, params)))
+        throw new Error(error.message)
+      }
+    )
+  }
+}
+
+export function deleteEntity(name, userid, id) {
+  const params = {name, userid, id}
+
+  return (dispatch, getState) => {
+    if (!isLoggedIn(getState)) {
+      // PUTTING data requires login to the network
+      let error = 'You must be logged in before you can do that'
+      dispatch(actionWithData(actionTypes.DELETE_ENTITY_FAILURE, Object.assign({}, {error}, params)))
+      throw new Error(error.message)
+    }
+
+    dispatch(actionWithData(actionTypes.DELETE_ENTITY_REQUEST, params))
+
+    return Firebase
+      .remove(generateApiEndpoint('entity', name, userid, id))
+      .then(() => {
+        // The data will be null now, which is what the default data is when it doesn't exist on the network
+        dispatch(actionWithData(actionTypes.DELETE_ENTITY_SUCCESS, Object.assign({}, {data: null}, params)))
+        return null
+      }, (error) => {
+        dispatch(actionWithData(actionTypes.DELETE_ENTITY_FAILURE, Object.assign({}, {error: error.message}, params)))
         throw new Error(error.message)
       }
     )
@@ -84,12 +105,10 @@ export function getCollection(name, userid) {
 
     return Firebase
       .get(generateApiEndpoint('collections', name, userid))
-      .then(
-      (data) => {
+      .then((data) => {
         dispatch(actionWithData(actionTypes.GET_COLLECTION_SUCCESS, Object.assign({}, {data}, params)))
         return data
-      },
-      (error) => {
+      }, (error) => {
         dispatch(actionWithData(actionTypes.GET_COLLECTION_FAILURE, Object.assign({}, {error: error.message}, params)))
         throw new Error(error.message)
       }
@@ -101,7 +120,7 @@ export function putCollectionItem(name, userid, id, data) {
   const params = {name, userid, id, data}
 
   return (dispatch, getState) => {
-    if (!isLoggedIn()) {
+    if (!isLoggedIn(getState)) {
       // PUTTING data requires login to the network
       let error = 'You must be logged in before you can do that'
       dispatch(actionWithData(actionTypes.PUT_COLLECTION_FAILURE, Object.assign({}, {error}, params)))
@@ -112,17 +131,67 @@ export function putCollectionItem(name, userid, id, data) {
 
     return Firebase
       .set(generateApiEndpoint('collection', name, userid, id), data)
-      .then(
-        () => {
+      .then(() => {
           dispatch(actionWithData(actionTypes.PUT_COLLECTION_SUCCESS, Object.assign({}, {data}, params)))
           // Return the item we put into the collection, not the whole collection
           return data
-        },
-        (error) => {
+        }, (error) => {
           dispatch(actionWithData(actionTypes.PUT_COLLECTION_FAILURE, Object.assign({}, {error: error.message}, params)))
           throw new Error(error.message)
         }
       )
+  }
+}
+
+export function deleteCollectionItem(name, userid, id) {
+  const params = {name, userid, id}
+
+  return (dispatch, getState) => {
+    if (!isLoggedIn(getState)) {
+      // PUTTING data requires login to the network
+      let error = 'You must be logged in before you can do that'
+      dispatch(actionWithData(actionTypes.DELETEITEM_COLLECTION_FAILURE, Object.assign({}, {error}, params)))
+      throw new Error(error.message)
+    }
+
+    dispatch(actionWithData(actionTypes.DELETEITEM_COLLECTION_REQUEST, params))
+
+    return Firebase
+      .remove(generateApiEndpoint('collection', name, userid, id))
+      .then(() => {
+        dispatch(actionWithData(actionTypes.DELETEITEM_COLLECTION_SUCCESS, Object.assign({}, params)))
+        return null
+      }, (error) => {
+        dispatch(actionWithData(actionTypes.DELETEITEM_COLLECTION_FAILURE, Object.assign({}, {error: error.message}, params)))
+        throw new Error(error.message)
+      }
+    )
+  }
+}
+
+export function deleteEntireCollection(name, userid) {
+  const params = {name, userid}
+
+  return (dispatch, getState) => {
+    if (!isLoggedIn(getState)) {
+      // PUTTING data requires login to the network
+      let error = 'You must be logged in before you can do that'
+      dispatch(actionWithData(actionTypes.DELETEWHOLE_COLLECTION_FAILURE, Object.assign({}, {error}, params)))
+      throw new Error(error.message)
+    }
+
+    dispatch(actionWithData(actionTypes.DELETEWHOLE_COLLECTION_REQUEST, params))
+
+    return Firebase
+      .remove(generateApiEndpoint('collection', name, userid))
+      .then(() => {
+        dispatch(actionWithData(actionTypes.DELETEWHOLE_COLLECTION_SUCCESS, Object.assign({}, params)))
+        return null
+      }, (error) => {
+        dispatch(actionWithData(actionTypes.DELETEWHOLE_COLLECTION_FAILURE, Object.assign({}, {error: error.message}, params)))
+        throw new Error(error.message)
+      }
+    )
   }
 }
 
@@ -224,6 +293,6 @@ function signupFailure(error) {
 }
 
 // Helper
-function isLoggedIn() {
-  return store.getState().getIn(['auth', 'authData']) ? true : false
+function isLoggedIn(getState) {
+  return getState().getIn(['auth', 'userid']) ? true : false
 }
