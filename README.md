@@ -195,6 +195,19 @@ api.putEntity('posts', '42d9c8e2-4b4b-4879-918c-633fb2474b9b', 'b2509e6d-1a7f-44
    .then((postData) => console.log('Successfully added the post!', postData))
 ```
 
+#### deleteEntity(name, userid, id)
+
+Deletes the entity at the given location.
+
+**Returns**: promise
+
+**Example**:
+
+```javascript
+api.deleteEntity('posts', '42d9c8e2-4b4b-4879-918c-633fb2474b9b', 'b2509e6d-1a7f-44f4-96d7-06c1df9efdef')
+   .then((postData) => console.log('Successfully deleted the post!', postData))
+```
+
 #### getCollection(name, userid)
 
 Fetches the entire collection, identified by the the owner (userid) and the name of the collection. Pagination and ordering is not currently supported as it is not yet clear how it will work on SAFE.
@@ -239,6 +252,32 @@ const postId = 'b2509e6d-1a7f-44f4-96d7-06c1df9efdef',
 // The admin owns the "posts" collection, and a new post is added to it with its ID and its owner's userid.
 api.putCollectionItem('posts', adminId, postId, postMeta)
    .then((post) => console.log('Successfully added the collection item!', post))
+```
+
+#### deleteCollectionItem(name, userid, collectionItemId)
+
+Delete the collection item at it `collectionItemId`.
+
+**Returns**: promise
+
+**Example**:
+
+```javascript
+api.deleteCollectionItem('posts', adminId, postId)
+   .then(() => console.log('Deleted the post collection item!'))
+```
+
+#### deleteEntireCollection(name, userid)
+
+Deletes the *entire* provided collection. *Note: this will likely not have a corresponding SAFE action, and might be deleted in the future.*
+
+**Returns**: promise
+
+**Example**:
+
+```javascript
+api.deleteEntireCollection('posts', adminId)
+   .then(() => console.log('Deleted the whole posts collection!'))
 ```
 
 #### getAuthData()
@@ -384,7 +423,7 @@ For a complete example of hierarchyCallback, please see the [Like component](htt
 
 ### To Do / Future Ideas
 
-* **Deletes** -- add a DELETE operation.
+* ~~**Deletes** -- add a DELETE operation.~~ DONE
 * **Nested locations** -- objects are currently stored with their name serving as the location. Allow using nested locations. E.g. allow storing a collection of 'likes' for a particular post at `/users/userid/collections/postLikes/mypostid/likes/1234`.
 * **Models** -- allow passing in specialized Models to the "h" function. These models will have built-in functions that automatically validate the data retrieved from SAFE. It is possible for users to modify data on their own drives to have invalid, bogus, or even dangerous data. Validation will ensure that the application will retrieves data it knows how to use. See issue for discussion (coming soon)
 * **Versioning** -- also to be added to models. As apps evolve, their data naturally change. Since users own their own data, it is impossible for a site admin to update all data to use new rules. Adding versioning capability will allow the app to easily process outdated data by transforming it to a modern format. See issue for discussion (coming soon)
